@@ -1,11 +1,18 @@
-const express = require("express");
+import express from "express";
+import appError from "./middlewares/error.js";
+
+import dotenv from "dotenv";
+dotenv.config();
+
 const app = express();
 const port = process.env.port || 3000;
 
-const helmet = require("helmet");
-const cors = require("cors");
-const booksRouters = require("./routers/Books");
-const adminRouters = require("./routers/admin");
+import helmet from "helmet";
+import cors from "cors";
+import booksRouters from "./routers/Books.js";
+import adminRouters from "./routers/admin.js";
+
+const basicURL = "/api/v2";
 
 app.get("/help", (request, response) => {
   response.send("<h1>hello freind </h1>");
@@ -14,8 +21,14 @@ app.get("/help", (request, response) => {
 app.use(express.json());
 app.use(helmet());
 app.use(cors());
-app.use("/api/books", booksRouters);
-app.use("/api/admin", adminRouters);
+
+process.on("uncaughtException", (error) => {
+  console.log("uncaughtException error::", error);
+});
+app.use(`${basicURL}/books`, booksRouters);
+app.use(`${basicURL}/admins`, adminRouters);
+
+app.use(appError);
 
 app.listen(port, () => {
   console.log(`app is running on port ${port}`);

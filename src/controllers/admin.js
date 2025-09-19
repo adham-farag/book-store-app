@@ -1,71 +1,76 @@
-const adminmodel = require("../models/admin");
-const bcrypt = require("bcrypt");
-const jwt = require("jsonwebtoken");
+import * as adminModels from "../models/admin.js";
+import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
 
-const register = async (request, response) => {
-  const admin = { ...request.body };
+export const add = async (req, res, next) => {
+  try {
+    const admin = { ...req.body };
 
-  const checkDuplication = await adminmodel.selectone({
-    email: admin.email,
-  });
-
-  if (checkDuplication === null) {
-    const salt = bcrypt.genSaltSync(10);
-
-    const hashedpassword = bcrypt.hashSync(admin.password, salt);
-
-    admin.password = hashedpassword;
-
-    const queryResult = adminmodel.add(admin);
-    return response.status(200).json({
-      status: "ok",
-      msg: "admin is inserted",
+    const queryresult = await adminModels.selectOne({
+      email: admin.email,
     });
-  } else {
-    return response.status(409).json({
-      status: "error",
-      msg: `email${admin.email} is in database`,
-    });
-  }
-};
 
-const login = async (request, response) => {
-  const admin = { ...request.body };
+    if (!queryresult) {
+      const salt = bcrypt.genSaltSync(10);
+      const hashedpassword = bcrypt.hashSync(admin.password, salt);
+      admin.password = hashedpassword;
 
-  const storedAdmin = await adminmodel.selectone({
-    email: admin.email,
-  });
-  if (storedAdmin === null) {
-    return response.status(404).json({
-      status: "error",
-      msg: `email:${admin.email} not found `,
-    });
-  } else {
-    const isvalid = bcrypt.compareSync(admin.password, storedAdmin.password);
-    if (isvalid) {
-      const token = jwt.sign(
-        {
-          name: storedAdmin.name,
-          email: storedAdmin.email,
-        },
-        "key@1234#"
-      );
+      const insert = await adminModels.add(admin);
 
-      response.header("x-auth-token", token);
-
-      return response.status(200).json({
-        status: "OK",
-        msg: "login",
+      return res.status(201).json({
+        status: "success",
+        msg: "admin inserted",
+      });
+    } else {
+      return res.status(409).json({
+        status: "error",
+        msg: "admin is already exists",
       });
     }
+  } catch (error) {
+    next(error);
   }
-  return response.status(401).json({
-    status: "error",
-    msg: "invalid password",
-  });
 };
 
-module.exports = {
-  register,
-  login,
+export const login = async (req, res, next) => {
+  try {
+    const admin = { ...req.body };
+
+    const queryresult = await adminModels.selectOne({
+      email: admin.email,
+    });
+
+    if (!queryresult) {
+      return res.status(404).json({
+        status: "error",
+        msg: "invalid email or password",
+      });
+    }
+
+    const ismatch = bcrypt.compareSync(admin.password, queryresult.password);
+
+    if (ismatch) {
+      const token = jwt.sign(
+        {
+          name: queryresult.name,
+          email: queryresult.email,
+          id: queryresult._id,
+        },
+        process.env.KEY_TOKEN
+      );
+
+      res.header("x-auth", token);
+      return res.status(200).json({
+        status: "success",
+        msg: "login successful ",
+      });
+    } else {
+      return res.status(401).json({
+        status: "error",
+        msg: "invalid email or password",
+      });
+    }
+  } catch (error) {
+    next(error);
+  }
 };

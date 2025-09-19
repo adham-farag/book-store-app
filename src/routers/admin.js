@@ -1,10 +1,11 @@
-const router = require("express").Router();
-const controller = require("../controllers/admin");
-const validation = require("../validations/admin");
-const validationlogin = require("../validations/login");
+import express from "express";
+import adminvalidation from "../validations/admin.js";
+import * as admincontrollers from "../controllers/admin.js";
+import loginValidation from "../validations/login.js";
 
-router.post("", validation, controller.register);
+const router = express.Router();
 
-router.post("/login", validationlogin, controller.login);
+router.post("/register", adminvalidation, admincontrollers.add);
+router.post("/login", loginValidation, admincontrollers.login);
 
-module.exports = router;
+export default router;

@@ -1,28 +1,28 @@
-const databaseconfig = require("../db/config");
-const databaseName = "bookstore";
-const collectionName = "admin";
+import openconnection from "../db/config.mjs";
+import adminSchema from "../db/schema/admin.js";
 
-const add = async (admin) => {
-  const admincollection = await databaseconfig.openconnection(
+const databaseName = "book-store";
+const collectionName = "Admin";
+
+export const add = async (admin) => {
+  const collection = await openconnection(
     databaseName,
-    collectionName
+    collectionName,
+    adminSchema
   );
-  const queryResult = await admincollection.insertOne(admin);
+  const insertresult = await collection.create(admin);
 
-  return queryResult;
+  return insertresult;
 };
 
-const selectone = async (condation) => {
-  const admincollection = await databaseconfig.openconnection(
+export const selectOne = async (condition) => {
+  const collection = await openconnection(
     databaseName,
-    collectionName
+    collectionName,
+    adminSchema
   );
-  const admin = await admincollection.findOne(condation);
 
-  return admin;
-};
+  const selectresult = await collection.findOne(condition);
 
-module.exports = {
-  add,
-  selectone,
+  return selectresult;
 };
