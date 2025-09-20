@@ -70,7 +70,7 @@ export const restoreAdmin = async (adminId) => {
     adminSchema
   );
 
-  const restoreresult = collection.findByIdAndUpdate(
+  const restoreresult = await collection.findByIdAndUpdate(
     adminId,
     {
       $set: { isDeleted: false },
