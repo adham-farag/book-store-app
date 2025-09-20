@@ -7,5 +7,8 @@ const router = express.Router();
 
 router.post("/register", adminvalidation, admincontrollers.add);
 router.post("/login", loginValidation, admincontrollers.login);
+router.put("/update/:id", adminvalidation, admincontrollers.update);
+router.delete("/delete/:id", admincontrollers.deleteAdmin);
+router.patch("/restore/:id", admincontrollers.restore);
 
 export default router;
