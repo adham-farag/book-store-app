@@ -1,35 +1,34 @@
-const { request, response } = require("express");
-const Joi = require("joi");
+import Joi from "joi";
 
+const bookValidation = (request, response, next) => {
+  const book = { ...request.body };
 
+  const validation = Joi.object({
+    title: Joi.string()
+      .min(5)
+      .max(50)
+      .pattern(/^[\u0600-\u06ffa-zA-Z ]{5,50}$/)
+      .required(),
+    description: Joi.string().min(10).max(200).required(),
+    authors: Joi.array()
+      .items(
+        Joi.string()
+          .min(5)
+          .max(50)
+          .pattern(/^[\u0600-\u06ffa-zA-Z ]{5,50}$/)
+      )
+      .required(),
+  }).validate(book);
 
-module.exports=(request,response,next)=>{
+  if (validation.error) {
+    return response.status(400).json({
+      status: "error",
+      code: "400",
+      msg: validation.error.details,
+    });
+  }
 
-const book = {...request.body}
+  next();
+};
 
-
-    
-    
-    const validation = Joi.object({
-     
-     name: Joi.string().min(5).max(50).pattern(/^[a-zA-Z\ ]{5,50}$/).required(),
-     description: Joi.string().min(10).max(100).required(),
-     authors: Joi.array().items(Joi.string().min(5).max(50).pattern(/^[a-zA-Z\ ]{5,50}$/)).required(),
-    
-    }).validate(book)
-    
-    if(validation.error){
-        return response.status(400).json({
-    
-       status:"error",
-       code:"400",
-       msg:validation.error.details,
-     })
-    };
-
-     next()
-
-}
-
- 
-
+export default bookValidation;

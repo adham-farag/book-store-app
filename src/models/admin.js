@@ -79,3 +79,15 @@ export const restoreAdmin = async (adminId) => {
   );
   return restoreresult;
 };
+
+export const selectAll = async (condition, fields) => {
+  const collection = await openconnection(
+    databaseName,
+    collectionName,
+    adminSchema
+  );
+
+  const admins = await collection.find(condition,fields);
+
+  return admins;
+};

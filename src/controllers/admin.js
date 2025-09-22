@@ -142,3 +142,24 @@ export const restore = async (req, res, next) => {
     next(error);
   }
 };
+
+export const selectAll = async (req, res, next) => {
+  try {
+    const admins = await adminModels.selectAll(
+      {
+        isDeleted: false,
+      },
+      {
+        _id: 0,
+        password: 0,
+        isDeleted: 0,
+        createdAt: 0,
+        __v: 0,
+      }
+    );
+
+    return res.status(200).json(admins);
+  } catch (error) {
+    next(error);
+  }
+};

@@ -9,7 +9,7 @@ const adminvalidation = (request, response, next) => {
         .string()
         .min(3)
         .max(20)
-        .pattern(/^[a-zA-Z\ ]{3,20}$/)
+        .pattern(/^[\u0600-\u06ffa-zA-Z ]{3,20}$/)
         .required(),
       email: joi.string().email().min(7).max(40).required(),
       password: joi.string().min(2).max(20).required(),

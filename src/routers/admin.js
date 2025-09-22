@@ -5,6 +5,7 @@ import loginValidation from "../validations/login.js";
 
 const router = express.Router();
 
+router.get("/selectAll", admincontrollers.selectAll);
 router.post("/register", adminvalidation, admincontrollers.add);
 router.post("/login", loginValidation, admincontrollers.login);
 router.put("/update/:id", adminvalidation, admincontrollers.update);

@@ -1,10 +1,9 @@
-const { request, response } = require("express");
-const jwt = require("jsonwebtoken");
-module.exports = (request, response, next) => {
+import jwt from "jsonwebtoken";
+const authMW = (request, response, next) => {
   if (request.headers.authorization) {
     const token = request.headers.authorization.split(" ")[1];
 
-    jwt.verify(token, "key@1234#", (error, decodedToken) => {
+    jwt.verify(token, process.env.KEY_TOKEN, (error, decodedToken) => {
       if (error) {
         return response.status(401).json({
           status: "error",
@@ -25,3 +24,5 @@ module.exports = (request, response, next) => {
     });
   }
 };
+
+export default authMW;
