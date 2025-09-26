@@ -3,7 +3,7 @@ const authMW = (request, response, next) => {
   if (request.headers.authorization) {
     const token = request.headers.authorization.split(" ")[1];
 
-    jwt.verify(token, process.env.KEY_TOKEN, (error, decodedToken) => {
+    jwt.verify(token, process.env.ACCESS_KEY_TOKEN, (error, decodedToken) => {
       if (error) {
         return response.status(401).json({
           status: "error",

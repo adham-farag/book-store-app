@@ -1,7 +1,7 @@
 import * as adminModels from "../models/admin.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
-import { ReturnDocument } from "mongodb";
+import authMW from "../middlewares/auth.js";
 
 export const add = async (req, res, next) => {
   try {
@@ -48,22 +48,39 @@ export const login = async (req, res, next) => {
       });
     }
 
-    const ismatch = bcrypt.compareSync(admin.password, queryresult.password);
+    const ismatch = await bcrypt.compare(admin.password, queryresult.password);
 
     if (ismatch) {
-      const token = jwt.sign(
+      const accessToken = jwt.sign(
         {
           name: queryresult.name,
           email: queryresult.email,
           id: queryresult._id,
         },
-        process.env.KEY_TOKEN
+        process.env.ACCESS_KEY_TOKEN,
+        { expiresIn: "15m" }
       );
 
-      res.header("x-auth", token);
+      const refreshToken = jwt.sign(
+        {
+          name: queryresult.name,
+          email: queryresult.email,
+          id: queryresult._id,
+        },
+        process.env.REFRESH_KEY_TOKEN,
+        { expiresIn: "7d" }
+      );
+
+      res.header("x-auth", accessToken);
+      res.cookie("refreshToken", refreshToken, {
+        httpOnly: true,
+        secure: false,
+        sameSite: "strict",
+      });
       return res.status(200).json({
         status: "success",
         msg: "login successful ",
+        accessToken: accessToken,
       });
     } else {
       return res.status(401).json({
@@ -159,6 +176,51 @@ export const selectAll = async (req, res, next) => {
     );
 
     return res.status(200).json(admins);
+  } catch (error) {
+    next(error);
+  }
+};
+export const refreshAccessToken = async (req, res, next) => {
+  try {
+    const refreshToken = req.cookies.refreshToken;
+
+    if (!refreshToken) {
+      return res.sendStatus(401);
+    }
+
+    jwt.verify(
+      refreshToken,
+      process.env.REFRESH_KEY_TOKEN,
+      (err, decodedToken) => {
+        if (err) {
+          return res.sendStatus(403);
+        }
+
+        const accessToken = jwt.sign(
+          {
+            name: decodedToken.name,
+            email: decodedToken.email,
+            id: decodedToken.id,
+          },
+          process.env.ACCESS_KEY_TOKEN,
+          { expiresIn: "15m" }
+        );
+
+        return res.json({ accessToken });
+      }
+    );
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const logout = async (req, res, next) => {
+  try {
+    res.clearCookie("refreshToken");
+    return res.status(200).json({
+      status: "success",
+      msg: "logout successful",
+    });
   } catch (error) {
     next(error);
   }

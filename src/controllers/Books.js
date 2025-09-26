@@ -4,6 +4,8 @@ export const add = async (req, res, next) => {
   try {
     const book = { ...req.body };
 
+    book.currentQuantity = book.quantity;
+
     const insert = await bookModels.add(book);
 
     return res.status(201).json({

@@ -18,6 +18,9 @@ const bookValidation = (request, response, next) => {
           .pattern(/^[\u0600-\u06ffa-zA-Z ]{5,50}$/)
       )
       .required(),
+    price: Joi.number().required(),
+    quantity: Joi.number().required(),
+    image: Joi.string().required(),
   }).validate(book);
 
   if (validation.error) {

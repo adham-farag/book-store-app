@@ -8,8 +8,10 @@ const router = express.Router();
 router.get("/selectAll", admincontrollers.selectAll);
 router.post("/register", adminvalidation, admincontrollers.add);
 router.post("/login", loginValidation, admincontrollers.login);
+router.post("/refreshtoken", admincontrollers.refreshAccessToken);
 router.put("/update/:id", adminvalidation, admincontrollers.update);
 router.delete("/delete/:id", admincontrollers.deleteAdmin);
 router.patch("/restore/:id", admincontrollers.restore);
+router.post("/logout", admincontrollers.logout);
 
 export default router;
