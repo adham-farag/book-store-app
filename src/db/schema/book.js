@@ -2,6 +2,7 @@ import mongoose from "mongoose";
 
 const bookschema = new mongoose.Schema(
   {
+    adminId: { type: mongoose.Types.ObjectId, required: true },
     title: { type: String, required: true },
     description: { type: String, required: true },
     authors: { type: Array, required: true },
@@ -9,7 +10,8 @@ const bookschema = new mongoose.Schema(
     quantity: { type: Number, required: true },
     currentQuantity: { type: Number },
     image: { type: String, required: true },
-    isAvilable: { type: Boolean, default: true, required: true },
+    isDeleted: { type: Boolean, default: false, required: true },
+    isAvailable: { type: Boolean, default: true, required: true },
   },
   { timestamps: true }
 );

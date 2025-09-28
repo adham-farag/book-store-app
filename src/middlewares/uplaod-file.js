@@ -1,5 +1,5 @@
 import multer from "multer";
-import getName from "../../helpers/get-file-name.js";
+import getName from "../helpers/get-file-name.js";
 
 export const storage = multer.diskStorage({
   destination: (request, file, cb) => {

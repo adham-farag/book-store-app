@@ -5,8 +5,11 @@ import * as bookscontroller from "../controllers/Books.js";
 import bookValidation from "../validations/Books.js";
 import { upload } from "../middlewares/uplaod-file.js";
 import normalize from "../middlewares/normalizeBody.js";
+import UbookValidation from "../validations/updateValidatio.js";
 
 const router = express.Router();
+
+router.get("/select", authMW, bookscontroller.selectAll);
 
 router.post(
   "/add",
@@ -19,7 +22,11 @@ router.post(
   },
   normalize,
   bookValidation,
-  bookscontroller.add
+  bookscontroller.register
 );
+
+router.post("/update/:id", authMW, UbookValidation, bookscontroller.update);
+router.delete("/delete/:id", authMW, bookscontroller.remove);
+router.patch("/restore/:id", authMW, bookscontroller.restore);
 
 export default router;

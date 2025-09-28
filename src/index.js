@@ -1,6 +1,5 @@
 import express from "express";
 import appError from "./middlewares/error.js";
-import path from "path";
 
 import dotenv from "dotenv";
 dotenv.config();
