@@ -1,0 +1,13 @@
+import mongoose from "mongoose";
+
+const customerSchema = new mongoose.Schema(
+  {
+    name: { type: String, required: true },
+    email: { type: String, required: true, unique: true },
+    password: { type: String, required: true },
+    isDeleted: { type: Boolean, default: false, requred: true },
+  },
+  { timestamps: true }
+);
+
+export default customerSchema;
