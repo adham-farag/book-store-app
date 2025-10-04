@@ -2,6 +2,7 @@ import express from "express";
 import adminvalidation from "../validations/admin.js";
 import * as admincontrollers from "../controllers/admin.js";
 import loginValidation from "../validations/login.js";
+import authMW from "../middlewares/auth.js";
 
 const router = express.Router();
 

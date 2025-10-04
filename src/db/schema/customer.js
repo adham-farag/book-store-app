@@ -5,6 +5,8 @@ const customerSchema = new mongoose.Schema(
     name: { type: String, required: true },
     email: { type: String, required: true, unique: true },
     password: { type: String, required: true },
+    cart: { type: Array, required: true },
+    pageId: { type: String, required: true, unique: true },
     isDeleted: { type: Boolean, default: false, requred: true },
   },
   { timestamps: true }

@@ -1,10 +1,11 @@
 import * as customerModels from "../models/customer.js";
 import bcrypt from "bcrypt";
+import getName from "../helpers/get-file-name.js";
 import jwt from "jsonwebtoken";
 
 export const register = async (req, res, next) => {
   try {
-    const customer = { ...req.body };
+    const customer = { ...req.body, pageId: getName() };
     const selectOne = await customerModels.selectOne({
       email: customer.email,
     });
@@ -90,7 +91,7 @@ export const refreshToken = async (req, res, next) => {
   try {
     const refreshToken = req.cookies.refreshToken;
     if (!refreshToken) {
-      return res.sendstatus(401);
+      return res.sendStatus(401);
     }
 
     jwt.verify(
@@ -112,6 +113,173 @@ export const refreshToken = async (req, res, next) => {
         return res.json({ accessToken });
       }
     );
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const logout = async (req, res, next) => {
+  try {
+    res.clearCookie("refreshToken");
+    return res.status(200).json({
+      status: "success",
+      msg: "log out successful",
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+export const remove = async (req, res, next) => {
+  try {
+    const customerId = req.decodedToken._id;
+    const removeresult = await customerModels.deleteCutomer(customerId);
+    if (removeresult) {
+      return res.status(200).json({
+        status: "success",
+        msg: "customer deleted successful",
+      });
+    } else {
+      return res.status(404).json({
+        status: "error",
+        msg: "customerId not found",
+      });
+    }
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const restore = async (req, res, next) => {
+  try {
+    const customerId = req.decodedToken._id;
+    const restoreresult = await customerModels.restorecustomer(customerId);
+    if (restoreresult) {
+      return res.status(200).json({
+        status: "success",
+        msg: "customer restored successfuly",
+      });
+    } else {
+      return res.status(404).json({
+        status: "error",
+        msg: "customerId not found",
+      });
+    }
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const getProfile = async (req, res, next) => {
+  try {
+    const pageId = req.params.pageId;
+
+    const profiles = await customerModels.selectProfile(pageId);
+
+    if (profiles) {
+      return res.status(200).json(profiles);
+    } else {
+      return res.status(404).json({
+        status: "error",
+        msg: "pageId not found",
+      });
+    }
+  } catch (error) {
+    next(error);
+  }
+};
+export const update = async (req, res, next) => {
+  try {
+    const id = req.decodedToken._id;
+    const customer = { ...req.body, id };
+
+    const updatecustomer = await customerModels.updatecustomer(customer);
+    if (updatecustomer) {
+      return res.status(200).json({
+        status: "success",
+        msg: "customer updated",
+      });
+    } else {
+      return res.status(404).json({
+        status: "error",
+        msg: "customer id not found",
+      });
+    }
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const addToCart = async (req, res, next) => {
+  try {
+    const { productId, numberofitems } = req.body;
+    const customerId = req.decodedToken._id;
+    const insertResult = await customerModels.addtocart(
+      customerId,
+      productId,
+      numberofitems
+    );
+    console.log("customerId::", customerId);
+    console.log("productId::", productId);
+    console.log("numberofitems::", numberofitems);
+    if (insertResult) {
+      return res.status(200).json({
+        status: "success",
+        msg: "inserted to cart",
+      });
+    } else {
+      return res.status(404).json({
+        status: "error",
+        msg: "customerId not found",
+      });
+    }
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const selectCart = async (req, res, next) => {
+  try {
+    const customerId = req.decodedToken._id;
+    const carts = await customerModels.selectcart(customerId);
+    if (carts && carts.length > 0) {
+      return res.status(200).json({
+        status: "success",
+        data: carts,
+      });
+    } else {
+      return res.status(404).json({
+        status: "error",
+        msg: "customerId not found",
+      });
+    }
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const updateCart = async (req, res, next) => {
+  try {
+    const customerId = req.decodedToken._id;
+    const productId = req.params.productId;
+    const { numberofitems } = req.body;
+
+    const update = await customerModels.updateShoppingCart(
+      customerId,
+      productId,
+      numberofitems
+    );
+
+    if (update.modifiedCount === 1) {
+      return res.status(200).json({
+        status: "success",
+        msg: "cart updated successfuly",
+      });
+    } else {
+      return res.status(200).json({
+        status: "eror",
+        msg: "customer id not found",
+      });
+    }
   } catch (error) {
     next(error);
   }
