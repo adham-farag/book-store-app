@@ -13,6 +13,7 @@ import morgan from "morgan";
 import booksRouters from "./routers/Books.js";
 import adminRouters from "./routers/admin.js";
 import customerRouters from "./routers/customer.js";
+import addressesRouter from "./routers/addresses.js";
 import cookieParser from "cookie-parser";
 
 const basicURL = "/api/v2";
@@ -35,6 +36,7 @@ process.on("uncaughtException", (error) => {
 app.use(`${basicURL}/books`, booksRouters);
 app.use(`${basicURL}/admins`, adminRouters);
 app.use(`${basicURL}/customers`, customerRouters);
+app.use(`${basicURL}/addresses`, addressesRouter);
 
 app.use(appError);
 

@@ -20,5 +20,10 @@ router.put("/update", authMW, personValidation, customerController.update);
 router.get("/selectCart", authMW, customerController.selectCart);
 router.post("/addTocart", authMW, customerController.addToCart);
 router.put("/updateCart/:productId", authMW, customerController.updateCart);
+router.delete(
+  "/removeFromCart/:productId",
+  authMW,
+  customerController.removeFromCart
+);
 
 export default router;

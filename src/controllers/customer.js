@@ -218,9 +218,7 @@ export const addToCart = async (req, res, next) => {
       productId,
       numberofitems
     );
-    console.log("customerId::", customerId);
-    console.log("productId::", productId);
-    console.log("numberofitems::", numberofitems);
+
     if (insertResult) {
       return res.status(200).json({
         status: "success",
@@ -278,6 +276,30 @@ export const updateCart = async (req, res, next) => {
       return res.status(200).json({
         status: "eror",
         msg: "customer id not found",
+      });
+    }
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const removeFromCart = async (req, res, next) => {
+  try {
+    const customerId = req.decodedToken._id;
+    const { productId } = req.params;
+    const removeResult = await customerModels.deleteFromCart(
+      customerId,
+      productId
+    );
+    if (removeResult.modifiedCount === 1) {
+      return res.status(200).json({
+        status: "success",
+        msg: "product deleted successfuly",
+      });
+    } else {
+      return res.status(404).json({
+        status: "error",
+        msg: "product not found",
       });
     }
   } catch (error) {

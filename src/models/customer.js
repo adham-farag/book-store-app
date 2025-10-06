@@ -63,11 +63,23 @@ export const selectProfile = async (pageId) => {
       },
     },
     {
+      $addFields: {
+        country: "$Address.country",
+        city: "$Address.city",
+        street: "$Address.street",
+        apartmentNumber: "$Address.apartmentNumber",
+      },
+    },
+    {
       $project: {
         name: 1,
         email: 1,
         createdAt: 1,
         _id: 0,
+        country: 1,
+        city: 1,
+        street: 1,
+        apartmentNumber: 1,
       },
     },
     {
@@ -182,4 +194,49 @@ export const updateShoppingCart = async (
     }
   );
   return updateresult;
+};
+
+export const deleteFromCart = async (customerId, productId) => {
+  const collection = await openconnection(
+    databaseName,
+    collectionName,
+    customerSchema
+  );
+
+  const deleteItem = await collection.updateOne(
+    {
+      _id: customerId,
+    },
+    {
+      $pull: { cart: productId },
+    }
+  );
+  return deleteItem;
+};
+
+export const addAddresses = async (customerId, address) => {
+  const collection = await openconnection(
+    databaseName,
+    collectionName,
+    customerSchema
+  );
+  const queryresult = await collection.findByIdAndUpdate(customerId, {
+    $set: { Address: address },
+  });
+  return queryresult;
+};
+
+export const deleteAddress = async (customerId) => {
+  const collection = await openconnection(
+    databaseName,
+    collectionName,
+    customerSchema
+  );
+  const queryresult = await collection.updateOne(
+    { _id: customerId },
+    {
+      $unset: { Address: "" },
+    }
+  );
+  return queryresult;
 };

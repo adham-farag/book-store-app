@@ -6,6 +6,7 @@ const customerSchema = new mongoose.Schema(
     email: { type: String, required: true, unique: true },
     password: { type: String, required: true },
     cart: { type: Array, required: true },
+    Address: { type: Object, default: undefined },
     pageId: { type: String, required: true, unique: true },
     isDeleted: { type: Boolean, default: false, requred: true },
   },
